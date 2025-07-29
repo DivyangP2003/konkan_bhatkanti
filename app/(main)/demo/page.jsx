@@ -1,6 +1,6 @@
 "use client";
 
-import { destinations } from "@/data/destinations";
+import { cuisine } from "@/data/demo";
 import { useState } from "react";
 export default function GeocodeAll() {
   const [results, setResults] = useState([]);
@@ -22,8 +22,8 @@ export default function GeocodeAll() {
 
   const handleGeocodeAll = async () => {
     const updated = [];
-    for (const dest of destinations) {
-      const coords = await fetchCoordinates(dest.name);
+    for (const dest of cuisine) {
+      const coords = await fetchCoordinates(dest.region);
       updated.push({ ...dest, coordinates: coords });
     }
     setResults(updated);

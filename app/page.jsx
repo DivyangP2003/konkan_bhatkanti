@@ -1,4 +1,5 @@
 import AttractionsSection from "./_components/AttractionSection";
+import CulturalExperiencesPage from "./_components/CulturalExperiences";
 import CulturalTrailsCarousel from "./_components/CulturalTrailsCarousel";
 import DestinationsCarousel from "./_components/DestinationsCarousel";
 import HeritageAndMonuments from "./_components/HeritageAndMonuments";
@@ -10,6 +11,7 @@ export default function HomePage() {
     <main className="min-h-screen">
       <Navigation />
       <HeroCarousel />
+      <CulturalExperiencesPage/>
       <CulturalTrailsCarousel />
       <DestinationsCarousel />
       <HeritageAndMonuments />

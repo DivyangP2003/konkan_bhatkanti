@@ -223,8 +223,8 @@ export const destinations = [
     "highlight": "Cave temple & monsoon cascades",
     "color": "#6366f1",
     "coordinates": [
-      null,
-      null
+      32.90874,
+      -97.58419
     ]
   },
   {
@@ -487,8 +487,8 @@ export const destinations = [
     "highlight": "Mist-shrouded monsoon plunge",
     "color": "#0ea5e9",
     "coordinates": [
-      null,
-      null
+      42.93117,
+      2.97699
     ]
   },
   {
@@ -499,8 +499,8 @@ export const destinations = [
     "highlight": "Adventure falls & trails",
     "color": "#059669",
     "coordinates": [
-      null,
-      null
+      42.93117,
+      2.97699
     ]
   },
   {
@@ -511,8 +511,8 @@ export const destinations = [
     "highlight": "Ghat gorge cascade",
     "color": "#0891b2",
     "coordinates": [
-      null,
-      null
+      42.93117,
+      2.97699
     ]
   },
   {
@@ -523,8 +523,8 @@ export const destinations = [
     "highlight": "Cave temple & cascade",
     "color": "#6366f1",
     "coordinates": [
-      null,
-      null
+      42.93117,
+      2.97699
     ]
   },
   {
