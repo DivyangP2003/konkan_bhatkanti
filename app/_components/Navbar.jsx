@@ -1,224 +1,360 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Menu,
-  X,
-  MapPin,
-  Search,
-  User,
+  Map,
+  Images,
+  Compass,
   Globe,
-  ChevronDown,
+  User,
+  MapPin,
+  PanelLeft,
+  X,
+  Home,
+  MessageSquare,
+  Leaf,
+  Film,
+  BookOpenText,
+  Sparkles,
+  Route,
+  ShieldCheck,
+  PenLine,
+  Star,
+  Mail,
+  HelpCircle,
 } from "lucide-react";
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+// Transparent, collapsible left sidebar + transparent top navbar.
+// - JS only (no TypeScript)
+// - Smooth animations via framer-motion
+// - Collapsed sidebar shows icons only with tooltips
+// - Mobile: off-canvas overlay; Desktop: expand/collapse width
+// - Navbar contains only: logo+name, map, gallery, browse, language toggle, sign-in/profile
+// - Sidebar items link to placeholder routes (pages not created)
 
 export default function Navigation() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  // Responsive breakpoint (md ~ 768px)
+  const LG_BREAKPOINT = 768;
 
-  const menuItems = [
-    { name: "Home", href: "#" },
-    {
-      name: "Explore",
-      href: "#explore",
-      submenu: [
-        { name: "Destinations", href: "/destinations" },
-        { name: "Cultural Trails", href: "/cultural-trails" },
-        { name: "Adventure Activities", href: "/adventure" },
-        { name: "Hidden Gems", href: "/hidden-gems" },
-      ],
-    },
-    {
-      name: "Experience",
-      href: "#experience",
-      submenu: [
-        { name: "Heritage & Monuments", href: "/heritage" },
-        { name: "Spiritual & Festivals", href: "/spiritual" },
-        { name: "Cuisine & Customs", href: "/cuisine" },
-      ],
-    },
-    {
-      name: "Plan Your Trip",
-      href: "#plan",
-      submenu: [
-        { name: "Itineraries", href: "/itineraries" },
-        { name: "Transportation", href: "/transportation" },
-        { name: "Accommodation", href: "/accommodation" },
-      ],
-    },
-    { name: "Stories & Insights", href: "/stories" },
-    { name: "About & Community", href: "/about" },
-    { name: "Contact", href: "/contact" },
-  ];
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== "undefined" ? window.innerWidth >= LG_BREAKPOINT : true
+  );
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [sidebarLocked, setSidebarLocked] = useState(false); // NEW
+  const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false); // mobile open/close
+  const [lang, setLang] = useState("EN");
 
-  const handleDropdownClick = (itemName) => {
-    setActiveDropdown(activeDropdown === itemName ? null : itemName);
-  };
+  // Keep sidebar default: expanded on desktop; closed on mobile
+  useEffect(() => {
+    const onResize = () => {
+      const desktop = window.innerWidth >= LG_BREAKPOINT;
+      setIsDesktop(desktop);
+      if (desktop) {
+        setSidebarMobileOpen(false);
+      }
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
-  const closeDropdown = () => {
-    setActiveDropdown(null);
-  };
+  // const toggleSidebar = useCallback(() => {
+  //   if (isDesktop) {
+  //     setSidebarExpanded((v) => !v);
+  //   } else {
+  //     setSidebarMobileOpen((v) => !v);
+  //   }
+  // }, [isDesktop]);
+
+  const closeMobileSidebar = useCallback(() => setSidebarMobileOpen(false), []);
+
+  const toggleLang = useCallback(() => {
+    setLang((l) => (l === "EN" ? "KN" : "EN"));
+  }, []);
+
+  // Hover handlers
+  const handleSidebarEnter = useCallback(() => {
+    if (isDesktop && !sidebarLocked) {
+      setSidebarExpanded(true);
+    }
+  }, [isDesktop, sidebarLocked]);
+
+  const handleSidebarLeave = useCallback(() => {
+    if (isDesktop && !sidebarLocked) {
+      setSidebarExpanded(false);
+    }
+  }, [isDesktop, sidebarLocked]);
+
+  const handleSidebarToggleClick = useCallback(() => {
+    if (isDesktop) {
+      // Toggle locked state
+      setSidebarLocked((locked) => {
+        const newLocked = !locked;
+        setSidebarExpanded(newLocked); // Always match expanded state to lock state
+        return newLocked;
+      });
+    } else {
+      // Mobile: just open/close
+      setSidebarMobileOpen((v) => !v);
+    }
+  }, [isDesktop]);
+
+  const navItems = useMemo(
+    () => [
+      { label: "Home", href: "/", icon: Home },
+      { label: "Chat", href: "/chat", icon: MessageSquare },
+      { label: "Smart Picks", href: "/recommendations", icon: Sparkles },
+      { label: "Trip Planner", href: "/itinerary", icon: Route },
+      { label: "Maps", href: "/maps", icon: Map },
+      { label: "Travel Safety", href: "/safety", icon: ShieldCheck },
+      { label: "Photo Gallery", href: "/gallery", icon: Images },
+      { label: "Community Blog", href: "/blog", icon: PenLine },
+      { label: "Reviews", href: "/reviews", icon: Star },
+      { label: "FAQs", href: "/faqs", icon: HelpCircle },
+      { label: "Contact Us", href: "/contact", icon: Mail },
+      { label: "Konkani Heritage", href: "/scholars", icon: BookOpenText },
+      { label: "Life in Konkan", href: "/daily-life", icon: Leaf },
+      { label: "Scenes of Konkan", href: "/konkani-scenes", icon: Film },
+    ],
+    []
+  );
+
+  // Sidebar width values
+  const expandedWidth = 288; // 18rem
+  const collapsedWidth = 72; // 4.5rem
+  const mobileWidth = 300;
+
+  // Shared styles
+  const glass =
+    "backdrop-transparent-md bg-white/0 border border-white/0 shadow-[0_8px_32px_rgba(0,0,0,0.15)]";
+  const nav =
+    "backdrop-blur-md bg-white/0 border border-white/0 shadow-[0_8px_32px_rgba(0,0,0,0.15)]";
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-teal-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <MapPin className="h-8 w-8 text-teal-600" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-orange-500 bg-clip-text text-transparent">
-              Konkan Explorer
-            </span>
-          </div>
+    <>
+      {/* Transparent Navbar */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 ${nav}`}
+        style={{
+          transition: "background-color 300ms ease, border-color 300ms ease",
+        }}
+        aria-label="Top Navigation"
+      >
+        <div className="px-4 sm:px-6 lg:px-4">
+          <div className="h-16 flex items-center justify-between">
+            {/* Left: Sidebar toggle + Logo/Name */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleSidebarToggleClick}
+                onMouseEnter={
+                  isDesktop && !sidebarLocked ? handleSidebarEnter : undefined
+                }
+                aria-label="Toggle sidebar"
+                className="mr-20 p-2 rounded-md hover:bg-white/10 transition-colors"
+              >
+                <PanelLeft className="h-6 w-6 text-white" />
+              </button>
 
-          {/* Desktop Navigation - Only show on large screens */}
-          <div className="hidden xl:flex items-center space-x-6">
-            {menuItems.map((item) => (
-              <div key={item.name} className="relative">
-                {item.submenu ? (
-                  <div className="relative">
-                    <button
-                      className="text-slate-700 hover:text-teal-600 font-medium transition-colors duration-200 relative group flex items-center space-x-1"
-                      onClick={() => handleDropdownClick(item.name)}
-                    >
-                      <span>{item.name}</span>
-                      <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          activeDropdown === item.name ? "rotate-180" : ""
-                        }`}
-                      />
-                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-teal-600 transition-all duration-200 group-hover:w-full"></span>
-                    </button>
-
-                    {/* Dropdown Menu */}
-                    {activeDropdown === item.name && (
-                      <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-teal-100 py-2 z-50">
-                        {item.submenu.map((subItem) => (
-                          <a
-                            key={subItem.name}
-                            href={subItem.href}
-                            className="block px-4 py-2 text-slate-700 hover:text-teal-600 hover:bg-teal-50 transition-colors"
-                            onClick={closeDropdown}
-                          >
-                            {subItem.name}
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <a
-                    href={item.href}
-                    className="text-slate-700 hover:text-teal-600 font-medium transition-colors duration-200 relative group"
-                  >
-                    {item.name}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-teal-600 transition-all duration-200 group-hover:w-full"></span>
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Utility Icons - Show on desktop */}
-          <div className="hidden xl:flex items-center space-x-4">
-            <button className="text-slate-700 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-teal-50">
-              <Search className="h-5 w-5" />
-            </button>
-            <button className="text-slate-700 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-teal-50">
-              <User className="h-5 w-5" />
-            </button>
-            <button className="text-slate-700 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-teal-50">
-              <Globe className="h-5 w-5" />
-            </button>
-          </div>
-
-          {/* Mobile menu button - Show on medium and small screens */}
-          <div className="xl:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-slate-700 hover:text-teal-600 transition-colors p-2"
-              aria-label="Toggle menu"
-            >
-              {isOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="xl:hidden bg-white border-t border-teal-100">
-            <div className="px-2 pt-2 pb-3 space-y-1 max-h-96 overflow-y-auto">
-              {menuItems.map((item) => (
-                <div key={item.name}>
-                  {item.submenu ? (
-                    <div>
-                      <button
-                        className="w-full text-left px-3 py-2 text-slate-700 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors flex items-center justify-between"
-                        onClick={() => handleDropdownClick(item.name)}
-                      >
-                        {item.name}
-                        <ChevronDown
-                          className={`w-4 h-4 transition-transform ${
-                            activeDropdown === item.name ? "rotate-180" : ""
-                          }`}
-                        />
-                      </button>
-                      {activeDropdown === item.name && (
-                        <div className="ml-4 mt-1 space-y-1">
-                          {item.submenu.map((subItem) => (
-                            <a
-                              key={subItem.name}
-                              href={subItem.href}
-                              className="block px-3 py-2 text-slate-600 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors text-sm"
-                              onClick={(e) => {
-                                // Let the navigation happen first
-                                setTimeout(() => {
-                                  setIsOpen(false);
-                                  setActiveDropdown(null);
-                                }, 0);
-                              }}
-                            >
-                              {subItem.name}
-                            </a>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <a
-                      href={item.href}
-                      className="block px-3 py-2 text-slate-700 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.name}
-                    </a>
-                  )}
-                </div>
-              ))}
-
-              {/* Mobile Utility Icons */}
-              <div className="flex items-center justify-center space-x-6 pt-4 border-t border-teal-100 mt-4">
-                <button className="text-slate-700 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-teal-50">
-                  <Search className="h-5 w-5" />
-                </button>
-                <button className="text-slate-700 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-teal-50">
-                  <User className="h-5 w-5" />
-                </button>
-                <button className="text-slate-700 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-teal-50">
-                  <Globe className="h-5 w-5" />
-                </button>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-8 w-8 text-teal-300" />
+                <span className="text-2xl font-bold text-white">
+                  Konkan Explorer
+                </span>
               </div>
             </div>
-          </div>
-        )}
-      </div>
 
-      {activeDropdown && !isOpen && (
-        <div className="fixed inset-0 z-40" onClick={closeDropdown}></div>
-      )}
-    </nav>
+            {/* Right: icons only per request */}
+            <TooltipProvider delayDuration={0}>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <IconButton
+                  href="/maps"
+                  // label="Map"
+                  icon={Map}
+                  className="text-white"
+                />
+                <IconButton
+                  href="/gallery"
+                  // label="Gallery"
+                  icon={Images}
+                  className="text-white"
+                />
+                <IconButton
+                  href="/browse"
+                  // label="Browse"
+                  icon={Compass}
+                  className="text-white"
+                />
+
+                {/* Language toggle */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={toggleLang}
+                      aria-label={`Language: ${lang}`}
+                      className="relative px-3 py-2 rounded-md hover:bg-white/10 transition-colors text-white flex items-center gap-2"
+                    >
+                      <Globe className="h-6 w-6 text-white " />
+                      <span className="hidden sm:block text-xm font-medium">
+                        {lang}
+                      </span>
+                    </button>
+                  </TooltipTrigger>
+                </Tooltip>
+
+                {/* Sign in / Profile */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <a
+                      href="/signin"
+                      className="px-3 py-2 rounded-md hover:bg-white/10 transition-colors text-white flex items-center gap-2"
+                      aria-label="Sign in / Profile"
+                    >
+                      <User className="h-6 w-6 text-white" />
+                      <span className="hidden sm:block text-xm font-medium">
+                        Sign in
+                      </span>
+                    </a>
+                  </TooltipTrigger>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
+          </div>
+        </div>
+      </nav>
+
+      {/* Transparent Collapsible Sidebar */}
+      {/* Desktop: collapsed/expanded; Mobile: off-canvas */}
+      <TooltipProvider delayDuration={0}>
+        <motion.aside
+          onMouseEnter={handleSidebarEnter}
+          onMouseLeave={handleSidebarLeave}
+          initial={false}
+          animate={{
+            width: isDesktop
+              ? sidebarExpanded
+                ? expandedWidth
+                : collapsedWidth
+              : sidebarMobileOpen
+              ? mobileWidth
+              : 0,
+            x: isDesktop ? 0 : sidebarMobileOpen ? 0 : -mobileWidth,
+          }}
+          transition={{ type: "spring", stiffness: 220, damping: 30 }}
+          className={`fixed left-0 top-0 z-40 h-screen overflow-hidden ${glass} ${
+            isDesktop ? "" : "max-w-[80vw]"
+          }`}
+          style={{ paddingTop: 64 }}
+          aria-label="Sidebar"
+          aria-expanded={isDesktop ? sidebarExpanded : sidebarMobileOpen}
+        >
+          {/* Close on mobile */}
+          <div className="absolute top-2 right-2 lg:hidden">
+            <button
+              onClick={closeMobileSidebar}
+              aria-label="Close sidebar"
+              className="p-2 rounded-md hover:bg-white/10 transition-colors text-white"
+            ></button>
+          </div>
+
+          <div className="h-full flex flex-col">
+            {/* Nav list */}
+            <nav className="flex-1 overflow-y-auto px-2 py-3">
+              <ul className="space-y-1">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <li key={item.href}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a
+                            href={item.href}
+                            className={`group flex items-center rounded-md transition-colors hover:bg-white/10 text-white/90 hover:text-white px-4 py-2`}
+                          >
+                            {/* Icon stays fixed in place */}
+                            <Icon className="h-6 w-6 text-white shrink-0" />
+
+                            {/* Label: fade in/out but space remains reserved */}
+                            <span
+                              className={`ml-3 truncate transition-opacity duration-200 ${
+                                isDesktop
+                                  ? sidebarExpanded
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                  : "opacity-100"
+                              }`}
+                              style={{
+                                visibility:
+                                  isDesktop && !sidebarExpanded
+                                    ? "hidden"
+                                    : "visible",
+                              }}
+                            >
+                              {item.label}
+                            </span>
+                          </a>
+                        </TooltipTrigger>
+                        {/* Show tooltip only when collapsed on desktop
+                        {isDesktop && !sidebarExpanded ? (
+                          <TooltipContent side="right">
+                            {item.label}
+                          </TooltipContent>
+                        ) : null} */}
+                      </Tooltip>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+
+            {/* Footer hint */}
+            <div
+              className={`border-t border-white/10 p-3 text-xs text-white/70 transition-opacity ${
+                isDesktop && !sidebarExpanded ? "opacity-0" : "opacity-100"
+              }`}
+              style={{
+                display: isDesktop && !sidebarExpanded ? "none" : "block",
+              }}
+            ></div>
+          </div>
+        </motion.aside>
+      </TooltipProvider>
+
+      {/* Mobile overlay when sidebar is open */}
+      <AnimatePresence>
+        {!isDesktop && sidebarMobileOpen ? (
+          <motion.div
+            className="fixed inset-0 z-30 bg-black/40"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeMobileSidebar}
+          />
+        ) : null}
+      </AnimatePresence>
+    </>
+  );
+}
+
+function IconButton({ href = "#", label, icon: Icon, className = "" }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <a
+          href={href}
+          aria-label={label}
+          className={`px-3 py-2 rounded-md hover:bg-white/10 transition-colors flex items-center justify-center ${className}`}
+          title={label}
+        >
+          <Icon className="h-6 w-6 text-white" />
+        </a>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">{label}</TooltipContent>
+    </Tooltip>
   );
 }

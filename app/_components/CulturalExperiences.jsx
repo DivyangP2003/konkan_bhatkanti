@@ -664,7 +664,7 @@ export default function CulturalExperiencesPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Floating Navigation */}
+      {/* Floating Navigation
       <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/90 backdrop-blur-md rounded-full px-6 py-3 shadow-lg border">
         <div className="flex items-center space-x-6">
           {[
@@ -690,7 +690,7 @@ export default function CulturalExperiencesPage() {
             </button>
           ))}
         </div>
-      </nav>
+      </nav> */}
 
       {/* Header Section - Clean Title and Subtitle */}
       <section className="relative min-h-screen bg-gray-100 py-20 overflow-hidden">
