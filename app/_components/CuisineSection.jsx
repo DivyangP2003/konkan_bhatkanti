@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { ChefHat, Fish, Leaf, Flame } from "lucide-react";
+import { useScrollReveal, useStaggerAnimation } from "@/app/_hooks/useScrollAnimation";
 
 export default function CuisineSection() {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.2 });
+  const staggerAnimation = useStaggerAnimation(0.15);
   const dishes = [
     {
       id: 1,
@@ -40,7 +43,7 @@ export default function CuisineSection() {
   ];
 
   return (
-    <section className="relative py-24 bg-gradient-to-b from-white to-slate-50 overflow-hidden">
+    <section ref={ref} className="relative py-24 bg-gradient-to-b from-white to-slate-50 overflow-hidden">
       {/* Background Accents */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-orange-100 rounded-full -mr-48 -mt-48 opacity-20" />
 
@@ -61,15 +64,18 @@ export default function CuisineSection() {
         </motion.div>
 
         {/* Dishes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
+          variants={staggerAnimation.container}
+          initial="hidden"
+          animate={isVisible ? "visible" : "hidden"}
+        >
           {dishes.map((dish, index) => {
             const Icon = dish.icon;
             return (
               <motion.div
                 key={dish.id}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                variants={staggerAnimation.item}
                 className="group relative"
               >
                 <div className="relative bg-white border border-slate-200 rounded-2xl p-8 hover:shadow-2xl transition-all duration-300 overflow-hidden">
@@ -107,7 +113,7 @@ export default function CuisineSection() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Experience CTA */}
         <motion.div

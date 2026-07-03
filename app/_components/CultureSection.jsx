@@ -2,9 +2,14 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useRef } from "react";
 import { Palette, Music, Users, BookOpen } from "lucide-react";
+import { useScrollReveal, useStaggerAnimation } from "@/app/_hooks/useScrollAnimation";
 
 export default function CultureSection() {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.2 });
+  const staggerAnimation = useStaggerAnimation(0.12);
+
   const sections = [
     {
       id: 1,
@@ -41,7 +46,7 @@ export default function CultureSection() {
   ];
 
   return (
-    <section className="relative py-24 bg-gradient-to-b from-slate-50 to-white overflow-hidden">
+    <section ref={ref} className="relative py-24 bg-gradient-to-b from-slate-50 to-white overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-100 rounded-full -mr-48 -mt-48 opacity-30" />
       <div className="absolute bottom-0 left-0 w-72 h-72 bg-teal-100 rounded-full -ml-36 -mb-36 opacity-30" />
@@ -63,15 +68,18 @@ export default function CultureSection() {
         </motion.div>
 
         {/* Culture Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          variants={staggerAnimation.container}
+          initial="hidden"
+          animate={isVisible ? "visible" : "hidden"}
+        >
           {sections.map((section, index) => {
             const Icon = section.icon;
             return (
               <motion.div
                 key={section.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                variants={staggerAnimation.item}
                 className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300"
               >
                 {/* Image Background */}
@@ -106,7 +114,7 @@ export default function CultureSection() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

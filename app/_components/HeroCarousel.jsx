@@ -1,15 +1,27 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { ChevronLeft, ChevronRight, ArrowDown } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
 export default function HeroCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
+  const [scrollY, setScrollY] = useState(0);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+      setScrollY(Math.min(scrolled / 100, 1)); // Cap at 1 for parallax effect
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   const slides = [
     {
       id: 1,
@@ -211,7 +223,7 @@ export default function HeroCarousel() {
   }, [isAutoPlaying, nextSlide]);
 
   return (
-    <div className="relative h-screen overflow-hidden">
+    <div className="relative h-screen overflow-hidden" ref={containerRef}>
       {/* Dynamic Animated Background */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -238,6 +250,42 @@ export default function HeroCarousel() {
         style={{
           backgroundImage: `radial-gradient(circle at 25% 25%, ${currentSlideData.colors.primary}40 0%, transparent 50%), radial-gradient(circle at 75% 75%, ${currentSlideData.colors.secondary}40 0%, transparent 50%)`,
           backgroundSize: "100px 100px",
+        }}
+      />
+
+      {/* Floating Accent Elements */}
+      <motion.div
+        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none"
+        style={{
+          background: currentSlideData.colors.primary,
+          y: scrollY * -50,
+        }}
+        animate={{
+          scale: [1, 1.2, 1],
+          y: [0, -20, 0],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Number.POSITIVE_INFINITY,
+          repeatType: "reverse",
+        }}
+      />
+
+      <motion.div
+        className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full opacity-20 blur-3xl pointer-events-none"
+        style={{
+          background: currentSlideData.colors.secondary,
+          y: scrollY * 30,
+        }}
+        animate={{
+          scale: [1, 1.1, 1],
+          y: [0, 20, 0],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Number.POSITIVE_INFINITY,
+          repeatType: "reverse",
+          delay: 0.5,
         }}
       />
 
@@ -365,6 +413,21 @@ export default function HeroCarousel() {
       >
         <ChevronRight className="h-6 w-6 group-hover:scale-110 transition-transform" />
       </motion.button>
+
+      {/* Scroll Down Indicator */}
+      <motion.div
+        className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
+        animate={{ y: [0, 10, 0] }}
+        transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+      >
+        <p className="text-white/70 text-sm font-medium tracking-widest">SCROLL TO EXPLORE</p>
+        <motion.div
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+        >
+          <ArrowDown className="w-5 h-5 text-white/70" />
+        </motion.div>
+      </motion.div>
 
       {/* Dots Navigation */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">

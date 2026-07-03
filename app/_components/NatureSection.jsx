@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { Leaf, Fish, Trees, Droplets } from "lucide-react";
+import { useScrollReveal, useStaggerAnimation } from "@/app/_hooks/useScrollAnimation";
 
 export default function NatureSection() {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.2 });
+  const staggerAnimation = useStaggerAnimation(0.1);
   const features = [
     {
       id: 1,
@@ -40,7 +43,7 @@ export default function NatureSection() {
   ];
 
   return (
-    <section className="relative py-24 bg-white overflow-hidden">
+    <section ref={ref} className="relative py-24 bg-white overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-80 h-80 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full -ml-40 -mt-40 opacity-20" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-teal-100 to-cyan-100 rounded-full -mr-48 -mb-48 opacity-20" />
@@ -62,15 +65,18 @@ export default function NatureSection() {
         </motion.div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={staggerAnimation.container}
+          initial="hidden"
+          animate={isVisible ? "visible" : "hidden"}
+        >
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <motion.div
                 key={feature.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                variants={staggerAnimation.item}
                 className="group relative"
               >
                 {/* Card */}
@@ -97,7 +103,7 @@ export default function NatureSection() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* CTA Section */}
         <motion.div

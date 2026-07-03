@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { Sparkles, Music, Flame, Gift } from "lucide-react";
+import { useScrollReveal, useStaggerAnimation } from "@/app/_hooks/useScrollAnimation";
 
 export default function FestivalsSection() {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.2 });
+  const staggerAnimation = useStaggerAnimation(0.15);
   const festivals = [
     {
       id: 1,
@@ -63,17 +66,17 @@ export default function FestivalsSection() {
   };
 
   return (
-    <section className="relative py-24 bg-gradient-to-b from-slate-50 to-white overflow-hidden">
+    <section ref={ref} className="relative py-24 bg-gradient-to-b from-slate-50 to-white overflow-hidden">
       {/* Decorative Background */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-rose-100 to-pink-100 rounded-full -ml-48 -mt-48 opacity-30" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          variants={staggerAnimation.container}
+          initial="hidden"
+          animate={isVisible ? "visible" : "hidden"}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
         >
           <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
             Festivals & Celebrations
@@ -96,7 +99,7 @@ export default function FestivalsSection() {
             return (
               <motion.div
                 key={festival.id}
-                variants={itemVariants}
+                variants={staggerAnimation.item}
                 className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300"
               >
                 {/* Gradient Header */}

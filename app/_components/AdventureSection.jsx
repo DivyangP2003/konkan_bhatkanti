@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { Waves, Mountain, Zap, Compass } from "lucide-react";
+import { useScrollReveal, useStaggerAnimation } from "@/app/_hooks/useScrollAnimation";
 
 export default function AdventureSection() {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.2 });
+  const staggerAnimation = useStaggerAnimation(0.12);
   const adventures = [
     {
       id: 1,
@@ -44,7 +47,7 @@ export default function AdventureSection() {
   ];
 
   return (
-    <section className="relative py-24 bg-white overflow-hidden">
+    <section ref={ref} className="relative py-24 bg-white overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-200 to-cyan-200 rounded-full opacity-20 animate-pulse" />
@@ -68,15 +71,18 @@ export default function AdventureSection() {
         </motion.div>
 
         {/* Adventures Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <motion.div
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16"
+          variants={staggerAnimation.container}
+          initial="hidden"
+          animate={isVisible ? "visible" : "hidden"}
+        >
           {adventures.map((adventure, index) => {
             const Icon = adventure.icon;
             return (
               <motion.div
                 key={adventure.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                variants={staggerAnimation.item}
                 className="group relative bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-8 hover:border-emerald-300 hover:shadow-2xl transition-all duration-300"
               >
                 {/* Icon */}
@@ -136,7 +142,7 @@ export default function AdventureSection() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Featured Experience */}
         <motion.div
