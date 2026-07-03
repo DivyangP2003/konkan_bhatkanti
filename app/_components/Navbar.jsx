@@ -3,358 +3,221 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Map,
-  Images,
-  Compass,
-  Globe,
-  User,
-  MapPin,
-  PanelLeft,
+  Menu,
   X,
   Home,
-  MessageSquare,
+  Compass,
+  MapPin,
+  Images,
+  BookOpenText,
   Leaf,
   Film,
-  BookOpenText,
-  Sparkles,
-  Route,
-  ShieldCheck,
-  PenLine,
-  Star,
-  Mail,
-  HelpCircle,
+  Utensils,
+  Users,
+  Mountain,
+  Waves,
+  MessageSquare,
+  MoreHorizontal,
 } from "lucide-react";
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
-// Transparent, collapsible left sidebar + transparent top navbar.
-// - JS only (no TypeScript)
-// - Smooth animations via framer-motion
-// - Collapsed sidebar shows icons only with tooltips
-// - Mobile: off-canvas overlay; Desktop: expand/collapse width
-// - Navbar contains only: logo+name, map, gallery, browse, language toggle, sign-in/profile
-// - Sidebar items link to placeholder routes (pages not created)
 
 export default function Navigation() {
-  // Responsive breakpoint (md ~ 768px)
-  const LG_BREAKPOINT = 768;
-
   const [isDesktop, setIsDesktop] = useState(
-    typeof window !== "undefined" ? window.innerWidth >= LG_BREAKPOINT : true
+    typeof window !== "undefined" ? window.innerWidth >= 1024 : true
   );
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [sidebarLocked, setSidebarLocked] = useState(false); // NEW
-  const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false); // mobile open/close
-  const [lang, setLang] = useState("EN");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const LG_BREAKPOINT = 1024;
 
-  // Keep sidebar default: expanded on desktop; closed on mobile
   useEffect(() => {
     const onResize = () => {
       const desktop = window.innerWidth >= LG_BREAKPOINT;
       setIsDesktop(desktop);
       if (desktop) {
-        setSidebarMobileOpen(false);
+        setMobileMenuOpen(false);
       }
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // const toggleSidebar = useCallback(() => {
-  //   if (isDesktop) {
-  //     setSidebarExpanded((v) => !v);
-  //   } else {
-  //     setSidebarMobileOpen((v) => !v);
-  //   }
-  // }, [isDesktop]);
-
-  const closeMobileSidebar = useCallback(() => setSidebarMobileOpen(false), []);
-
-  const toggleLang = useCallback(() => {
-    setLang((l) => (l === "EN" ? "KN" : "EN"));
-  }, []);
-
-  // Hover handlers
-  const handleSidebarEnter = useCallback(() => {
-    if (isDesktop && !sidebarLocked) {
-      setSidebarExpanded(true);
-    }
-  }, [isDesktop, sidebarLocked]);
-
-  const handleSidebarLeave = useCallback(() => {
-    if (isDesktop && !sidebarLocked) {
-      setSidebarExpanded(false);
-    }
-  }, [isDesktop, sidebarLocked]);
-
-  const handleSidebarToggleClick = useCallback(() => {
-    if (isDesktop) {
-      // Toggle locked state
-      setSidebarLocked((locked) => {
-        const newLocked = !locked;
-        setSidebarExpanded(newLocked); // Always match expanded state to lock state
-        return newLocked;
-      });
-    } else {
-      // Mobile: just open/close
-      setSidebarMobileOpen((v) => !v);
-    }
-  }, [isDesktop]);
-
   const navItems = useMemo(
     () => [
-      { label: "Home", href: "/", icon: Home },
-      { label: "Chat", href: "/chat", icon: MessageSquare },
-      { label: "Smart Picks", href: "/recommendations", icon: Sparkles },
-      { label: "Trip Planner", href: "/itinerary", icon: Route },
-      { label: "Maps", href: "/maps", icon: Map },
-      { label: "Travel Safety", href: "/safety", icon: ShieldCheck },
-      { label: "Photo Gallery", href: "/gallery", icon: Images },
-      { label: "Community Blog", href: "/blog", icon: PenLine },
-      { label: "Reviews", href: "/reviews", icon: Star },
-      { label: "FAQs", href: "/faqs", icon: HelpCircle },
-      { label: "Contact Us", href: "/contact", icon: Mail },
-      { label: "Konkani Heritage", href: "/scholars", icon: BookOpenText },
-      { label: "Life in Konkan", href: "/daily-life", icon: Leaf },
-      { label: "Scenes of Konkan", href: "/konkani-scenes", icon: Film },
+      { label: "Explore", href: "#", icon: Compass, main: true },
+      { label: "Heritage", href: "#", icon: BookOpenText },
+      { label: "Culture & Art", href: "#", icon: Leaf },
+      { label: "Flora & Fauna", href: "#", icon: Mountain },
+      { label: "Cuisine", href: "#", icon: Utensils },
+      { label: "Village Life", href: "#", icon: Users },
+      { label: "Monsoon Magic", href: "#", icon: Waves },
+      { label: "Gallery", href: "#", icon: Images },
+      { label: "Scenes", href: "#", icon: Film },
+      { label: "Travel Guide", href: "#", icon: MapPin },
     ],
     []
   );
 
-  // Sidebar width values
-  const expandedWidth = 288; // 18rem
-  const collapsedWidth = 72; // 4.5rem
-  const mobileWidth = 300;
-
-  // Shared styles
-  const glass =
-    "backdrop-transparent-md bg-white/0 border border-white/0 shadow-[0_8px_32px_rgba(0,0,0,0.15)]";
-  const nav =
-    "backdrop-blur-md bg-white/0 border border-white/0 shadow-[0_8px_32px_rgba(0,0,0,0.15)]";
+  const closeMenu = useCallback(() => setMobileMenuOpen(false), []);
 
   return (
     <>
-      {/* Transparent Navbar */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 ${nav}`}
-        style={{
-          transition: "background-color 300ms ease, border-color 300ms ease",
-        }}
-        aria-label="Top Navigation"
-      >
-        <div className="px-4 sm:px-6 lg:px-4">
+      {/* Modern Top Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-16 flex items-center justify-between">
-            {/* Left: Sidebar toggle + Logo/Name */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleSidebarToggleClick}
-                onMouseEnter={
-                  isDesktop && !sidebarLocked ? handleSidebarEnter : undefined
-                }
-                aria-label="Toggle sidebar"
-                className="mr-20 p-2 rounded-md hover:bg-white/10 transition-colors"
-              >
-                <PanelLeft className="h-6 w-6 text-white" />
-              </button>
-
-              <div className="flex items-center gap-2">
-                <MapPin className="h-8 w-8 text-teal-300" />
-                <span className="text-2xl font-bold text-white">
-                  Konkan Explorer
-                </span>
+            {/* Logo & Brand */}
+            <motion.a
+              href="/"
+              className="flex items-center gap-2 group"
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-lg flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-white" />
               </div>
+              <div className="hidden sm:block">
+                <h1 className="text-lg font-bold text-slate-900">Konkan</h1>
+                <p className="text-xs text-slate-500">Explorer</p>
+              </div>
+            </motion.a>
+
+            {/* Desktop Navigation */}
+            {isDesktop && (
+              <div className="hidden lg:flex items-center gap-1">
+                {navItems.slice(0, 6).map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <motion.a
+                      key={item.label}
+                      href={item.href}
+                      className="px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 flex items-center gap-2 group"
+                      whileHover={{ y: -2 }}
+                    >
+                      <Icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                      <span>{item.label}</span>
+                    </motion.a>
+                  );
+                })}
+                <div className="w-px h-6 bg-slate-200 mx-2" />
+                {navItems.slice(6, 9).map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <motion.a
+                      key={item.label}
+                      href={item.href}
+                      className="px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 flex items-center gap-2 group"
+                      whileHover={{ y: -2 }}
+                    >
+                      <Icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                      <span>{item.label}</span>
+                    </motion.a>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Right Actions */}
+            <div className="flex items-center gap-2">
+              {isDesktop && (
+                <>
+                  <motion.a
+                    href="/chat"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 flex items-center gap-2"
+                    whileHover={{ y: -2 }}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Chat</span>
+                  </motion.a>
+                  <motion.button
+                    className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-200"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Plan Trip
+                  </motion.button>
+                </>
+              )}
+
+              {/* Mobile Menu Button */}
+              {!isDesktop && (
+                <motion.button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label="Toggle menu"
+                >
+                  {mobileMenuOpen ? (
+                    <X className="w-6 h-6 text-slate-900" />
+                  ) : (
+                    <Menu className="w-6 h-6 text-slate-900" />
+                  )}
+                </motion.button>
+              )}
             </div>
-
-            {/* Right: icons only per request */}
-            <TooltipProvider delayDuration={0}>
-              <div className="flex items-center gap-1 sm:gap-2">
-                <IconButton
-                  href="/maps"
-                  // label="Map"
-                  icon={Map}
-                  className="text-white"
-                />
-                <IconButton
-                  href="/gallery"
-                  // label="Gallery"
-                  icon={Images}
-                  className="text-white"
-                />
-                <IconButton
-                  href="/browse"
-                  // label="Browse"
-                  icon={Compass}
-                  className="text-white"
-                />
-
-                {/* Language toggle */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={toggleLang}
-                      aria-label={`Language: ${lang}`}
-                      className="relative px-3 py-2 rounded-md hover:bg-white/10 transition-colors text-white flex items-center gap-2"
-                    >
-                      <Globe className="h-6 w-6 text-white " />
-                      <span className="hidden sm:block text-xm font-medium">
-                        {lang}
-                      </span>
-                    </button>
-                  </TooltipTrigger>
-                </Tooltip>
-
-                {/* Sign in / Profile */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <a
-                      href="/signin"
-                      className="px-3 py-2 rounded-md hover:bg-white/10 transition-colors text-white flex items-center gap-2"
-                      aria-label="Sign in / Profile"
-                    >
-                      <User className="h-6 w-6 text-white" />
-                      <span className="hidden sm:block text-xm font-medium">
-                        Sign in
-                      </span>
-                    </a>
-                  </TooltipTrigger>
-                </Tooltip>
-              </div>
-            </TooltipProvider>
           </div>
         </div>
       </nav>
 
-      {/* Transparent Collapsible Sidebar */}
-      {/* Desktop: collapsed/expanded; Mobile: off-canvas */}
-      <TooltipProvider delayDuration={0}>
-        <motion.aside
-          onMouseEnter={handleSidebarEnter}
-          onMouseLeave={handleSidebarLeave}
-          initial={false}
-          animate={{
-            width: isDesktop
-              ? sidebarExpanded
-                ? expandedWidth
-                : collapsedWidth
-              : sidebarMobileOpen
-              ? mobileWidth
-              : 0,
-            x: isDesktop ? 0 : sidebarMobileOpen ? 0 : -mobileWidth,
-          }}
-          transition={{ type: "spring", stiffness: 220, damping: 30 }}
-          className={`fixed left-0 top-0 z-40 h-screen overflow-hidden ${glass} ${
-            isDesktop ? "" : "max-w-[80vw]"
-          }`}
-          style={{ paddingTop: 64 }}
-          aria-label="Sidebar"
-          aria-expanded={isDesktop ? sidebarExpanded : sidebarMobileOpen}
-        >
-          {/* Close on mobile */}
-          <div className="absolute top-2 right-2 lg:hidden">
-            <button
-              onClick={closeMobileSidebar}
-              aria-label="Close sidebar"
-              className="p-2 rounded-md hover:bg-white/10 transition-colors text-white"
-            ></button>
-          </div>
-
-          <div className="h-full flex flex-col">
-            {/* Nav list */}
-            <nav className="flex-1 overflow-y-auto px-2 py-3">
-              <ul className="space-y-1">
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {!isDesktop && mobileMenuOpen && (
+          <motion.div
+            className="fixed top-16 left-0 right-0 z-40 bg-white border-b border-slate-200 shadow-lg"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <div className="grid grid-cols-2 gap-2">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <li key={item.href}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <a
-                            href={item.href}
-                            className={`group flex items-center rounded-md transition-colors hover:bg-white/10 text-white/90 hover:text-white px-4 py-2`}
-                          >
-                            {/* Icon stays fixed in place */}
-                            <Icon className="h-6 w-6 text-white shrink-0" />
-
-                            {/* Label: fade in/out but space remains reserved */}
-                            <span
-                              className={`ml-3 truncate transition-opacity duration-200 ${
-                                isDesktop
-                                  ? sidebarExpanded
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                  : "opacity-100"
-                              }`}
-                              style={{
-                                visibility:
-                                  isDesktop && !sidebarExpanded
-                                    ? "hidden"
-                                    : "visible",
-                              }}
-                            >
-                              {item.label}
-                            </span>
-                          </a>
-                        </TooltipTrigger>
-                        {/* Show tooltip only when collapsed on desktop
-                        {isDesktop && !sidebarExpanded ? (
-                          <TooltipContent side="right">
-                            {item.label}
-                          </TooltipContent>
-                        ) : null} */}
-                      </Tooltip>
-                    </li>
+                    <motion.a
+                      key={item.label}
+                      href={item.href}
+                      onClick={closeMenu}
+                      className="px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 flex items-center gap-2"
+                      whileHover={{ x: 4 }}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </motion.a>
                   );
                 })}
-              </ul>
-            </nav>
+                <motion.a
+                  href="/chat"
+                  onClick={closeMenu}
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 flex items-center gap-2 col-span-2"
+                  whileHover={{ x: 4 }}
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Chat</span>
+                </motion.a>
+                <motion.button
+                  onClick={closeMenu}
+                  className="col-span-2 px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-200"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Plan Trip
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            {/* Footer hint */}
-            <div
-              className={`border-t border-white/10 p-3 text-xs text-white/70 transition-opacity ${
-                isDesktop && !sidebarExpanded ? "opacity-0" : "opacity-100"
-              }`}
-              style={{
-                display: isDesktop && !sidebarExpanded ? "none" : "block",
-              }}
-            ></div>
-          </div>
-        </motion.aside>
-      </TooltipProvider>
-
-      {/* Mobile overlay when sidebar is open */}
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
-        {!isDesktop && sidebarMobileOpen ? (
+        {!isDesktop && mobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-30 bg-black/40"
+            className="fixed inset-0 z-30 bg-black/20 top-16"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={closeMobileSidebar}
+            onClick={closeMenu}
           />
-        ) : null}
+        )}
       </AnimatePresence>
     </>
-  );
-}
-
-function IconButton({ href = "#", label, icon: Icon, className = "" }) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <a
-          href={href}
-          aria-label={label}
-          className={`px-3 py-2 rounded-md hover:bg-white/10 transition-colors flex items-center justify-center ${className}`}
-          title={label}
-        >
-          <Icon className="h-6 w-6 text-white" />
-        </a>
-      </TooltipTrigger>
-      <TooltipContent side="bottom">{label}</TooltipContent>
-    </Tooltip>
   );
 }

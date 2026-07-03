@@ -1,34 +1,27 @@
-import AttractionsSection from "./_components/AttractionSection";
-import CulturalExperiencesPage from "./_components/CulturalExperiences";
-import CulturalTrailsCarousel from "./_components/CulturalTrailsCarousel";
-import DestinationsCarousel from "./_components/DestinationsCarousel";
-import HeritageAndMonuments from "./_components/HeritageAndMonuments";
 import HeroCarousel from "./_components/HeroCarousel";
 import Navigation from "./_components/Navbar";
+import CulturalExperiencesPage from "./_components/CulturalExperiences";
+import CultureSection from "./_components/CultureSection";
+import DestinationsCarousel from "./_components/DestinationsCarousel";
+import CuisineSection from "./_components/CuisineSection";
+import AdventureSection from "./_components/AdventureSection";
+import NatureSection from "./_components/NatureSection";
+import FestivalsSection from "./_components/FestivalsSection";
+import HeritageAndMonuments from "./_components/HeritageAndMonuments";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen pt-16 bg-white">
       <Navigation />
       <HeroCarousel />
-      <CulturalExperiencesPage/>
-      <CulturalTrailsCarousel />
       <DestinationsCarousel />
+      <CulturalExperiencesPage />
+      <CultureSection />
+      <CuisineSection />
+      <AdventureSection />
+      <NatureSection />
+      <FestivalsSection />
       <HeritageAndMonuments />
-
-      {/* <AttractionsSection/> */}
-
-      {/* Placeholder for other sections */}
-      <section className="h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-slate-800 mb-4">
-            More Sections Coming Soon
-          </h2>
-          <p className="text-xl text-slate-600">
-            Scroll down to see more amazing content about Konkan tourism
-          </p>
-        </div>
-      </section>
     </main>
   );
 }
